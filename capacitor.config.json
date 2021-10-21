@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "canairio_plugin",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}
