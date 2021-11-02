@@ -6,6 +6,12 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>canairio_plugin</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Mobis would like to record your observation location</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Mobis would like to record your observation location</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Mobis would like to record your observation location</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

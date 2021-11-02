@@ -16,6 +16,9 @@ android-template.iml
 !/build/.npmkeep
 lerna-debug.log
 local.properties
+ios/
+android/
+app.constant.ts
 contents.xcworkspacedata
 android-template/.gradle/
 android-template/app/app.iml
