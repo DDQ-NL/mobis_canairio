@@ -44,18 +44,8 @@ public output_json: string;
 
   constructor() {
  this.parseInitialize();
-  this.getLocation();  
+this.getLocation();  
  this.connect();
-
-
-
-
-let d = new Date();
-
-this.datetime=d;
-
-var unixTimeStamp = Math.floor(d.getTime() / 1000);
-this.datetime_ux=unixTimeStamp.toString();
 
   }
 
@@ -77,12 +67,7 @@ this.datetime_ux=unixTimeStamp.toString();
     }
 
 
-
-
  async  connect(): Promise <void> {
-
-
-
 
   try {
     await BleClient.initialize();
@@ -102,21 +87,47 @@ this.datetime_ux=unixTimeStamp.toString();
 
    console.log('canair.io result array', dataViewToText(result));
 
+
+
+let d = new Date();
+this.datetime=d;
+var unixTimeStamp = Math.floor(d.getTime() / 1000);
+this.datetime_ux=unixTimeStamp.toString();
+
 this.output_json=dataViewToText(result);
 
 this.txtpm25=this.output_json;
 
 var Comment = Parse.Object.extend('canairio_raw_data'); 
+
+
+
+    await BleClient.startNotifications(
+      device.deviceId,
+      PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC,
+
+      (value) => {
 var canairio_store = new Comment();
 
+this.txtpm25=dataViewToText(value);
+
 // set initial data record
-canairio_store.set('output_json',dataViewToText(result));
+canairio_store.set('output_json',dataViewToText(value));
 canairio_store.set('latitude',this.latitude);
 canairio_store.set('longitude',this.longitude);
 canairio_store.set('altitude',this.altitude);
-
 canairio_store.set('unix_time',this.datetime_ux);
 canairio_store.save();
+      }
+    );
+
+
+
+
+
+
+
+
 
 
 

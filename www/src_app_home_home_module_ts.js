@@ -39315,10 +39315,6 @@ let HomePage = class HomePage {
         this.parseInitialize();
         this.getLocation();
         this.connect();
-        let d = new Date();
-        this.datetime = d;
-        var unixTimeStamp = Math.floor(d.getTime() / 1000);
-        this.datetime_ux = unixTimeStamp.toString();
     }
     getLocation() {
         return (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__awaiter)(this, void 0, void 0, function* () {
@@ -39345,17 +39341,24 @@ let HomePage = class HomePage {
                 console.log('connected to device', device);
                 const result = yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.read(device.deviceId, PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC);
                 console.log('canair.io result array', (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(result));
+                let d = new Date();
+                this.datetime = d;
+                var unixTimeStamp = Math.floor(d.getTime() / 1000);
+                this.datetime_ux = unixTimeStamp.toString();
                 this.output_json = (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(result);
                 this.txtpm25 = this.output_json;
                 var Comment = parse__WEBPACK_IMPORTED_MODULE_2__.Parse.Object.extend('canairio_raw_data');
-                var canairio_store = new Comment();
-                // set initial data record
-                canairio_store.set('output_json', (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(result));
-                canairio_store.set('latitude', this.latitude);
-                canairio_store.set('longitude', this.longitude);
-                canairio_store.set('altitude', this.altitude);
-                canairio_store.set('unix_time', this.datetime_ux);
-                canairio_store.save();
+                yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.startNotifications(device.deviceId, PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC, (value) => {
+                    var canairio_store = new Comment();
+                    this.txtpm25 = (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(value);
+                    // set initial data record
+                    canairio_store.set('output_json', (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(value));
+                    canairio_store.set('latitude', this.latitude);
+                    canairio_store.set('longitude', this.longitude);
+                    canairio_store.set('altitude', this.altitude);
+                    canairio_store.set('unix_time', this.datetime_ux);
+                    canairio_store.save();
+                });
                 setTimeout(() => (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__awaiter)(this, void 0, void 0, function* () {
                     yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.stopLEScan();
                     console.log('stopped scanning');
@@ -40826,7 +40829,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n      Canair.io plugin\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content [fullscreen]=\"true\">\n  <ion-header collapse=\"condense\">\n    <ion-toolbar>\n      <ion-title size=\"large\">Canair.io plugin</ion-title>\n    </ion-toolbar>\n  </ion-header>\n\n  <div id=\"container\">\nPM2.5 output<br>\n  <ion-label primary>{{txtpm25}} </ion-label>\n  <ion-label primary>{{result}} </ion-label>\n<br>\nLat/lon\n<br>\n   <ion-label primary>{{latitude}} </ion-label>\n   <ion-label primary>{{longitude}} </ion-label>\n  \n\n </div>\n</ion-content>\n");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n      Canair.io MOBIS plugin\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content [fullscreen]=\"true\">\n  <ion-header collapse=\"condense\">\n    <ion-toolbar>\n      <ion-title size=\"large\">Canair.io plugin</ion-title>\n    </ion-toolbar>\n  </ion-header>\n<ion-item>\n<img src=\"assets/images/logo.png\">\n</ion-item>\n\n  <div id=\"container\">\n\n\n\n<ion-item>\n    <ion-label>\nCanairio output\n</ion-label>\n  </ion-item>\n<ion-item>\n   <ion-label primary>{{txtpm25}} </ion-label>\n   \n</ion-item>\n\n\n\n\n\n<ion-item>\n    <ion-label>  \nCoordinates</ion-label>\n</ion-item>\n\n<ion-item>\n   <ion-label primary>Lat: {{latitude}} </ion-label>\n   <ion-label primary>Lon: {{longitude}} </ion-label>\n   <ion-label primary>Alt: {{altitude}} </ion-label>\n   \n</ion-item>\n\n</div>\n\n</ion-content>\n");
 
 /***/ }),
 
