@@ -2,6 +2,8 @@ import { Parse } from 'parse';
 import { Component } from '@angular/core';
 import { ENV } from '../../app/app.constant';
 import { Geolocation} from '@capacitor/geolocation';
+import { Guid } from "guid-typescript";
+import {interval, Subscription} from 'rxjs';
 
 
 // Import the wrapper class directly
@@ -25,29 +27,110 @@ const PM25_SERVICE_CHARACTERISTIC = 'B0F332A8-A5AA-4F3F-BB43-F99E7791AE01';
 export class HomePage {
 public txtpm25: string;
 public datetime_ux: string;
-
 public datetime: Date;
-
 public latitude: number;
 public  longitude: number;
 public  altitude: number;
-
-
-  private parseAppId: string = ENV.parseAppId;
-  private parseServerUrl: string = ENV.parseServerUrl;
-  private parseJSKey: string=ENV.parseJSKey;
-
+private parseAppId: string = ENV.parseAppId;
+private parseServerUrl: string = ENV.parseServerUrl;
+private parseJSKey: string=ENV.parseJSKey;
 public result: string;
-
 public output_json: string;
+public rec_uid: string;
+public deviceId:string;
+public intervalID:number;
+public logInterval:number;
+public lblLogstatus: string;
 
 
-  constructor() {
- this.parseInitialize();
+constructor() {
+this.parseInitialize();
 this.getLocation();  
- this.connect();
+this.connect();
+this.logInterval=10000;
+this.lblLogstatus="Not logging";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   }
+
+
+
+async startLogging() {
+
+
+        this.intervalID = setInterval( () => {
+
+
+this.lblLogstatus="Logging..";
+          console.log("do stuff...") 
+
+          this.readandSave();
+
+/*
+          if (some.condition = true) {
+            clearInterval(id);
+          }*/
+
+        },this.logInterval);
+
+
+
+}
+
+
+async stopLogging() {
+ clearInterval(this.intervalID);
+ this.lblLogstatus="Not logging";
+
+}
+
+
+async readandSave() {
+
+  const result = await BleClient.read(this.deviceId, PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC);
+//   console.log('canair.io result array', dataViewToText(result));
+
+
+let d = new Date();
+this.datetime=d;
+var unixTimeStamp = Math.floor(d.getTime() / 1000);
+this.datetime_ux=unixTimeStamp.toString();
+this.output_json=dataViewToText(result);
+this.txtpm25=this.output_json;
+this.rec_uid = Guid.raw(); // make it a string
+
+var Comment = Parse.Object.extend('canairio_raw_data'); 
+var canairio_store = new Comment();
+// set initial data record
+canairio_store.set('record_UID',this.rec_uid);
+canairio_store.set('device_UID',this.deviceId);
+canairio_store.set('output_json',dataViewToText(result));
+canairio_store.set('latitude',this.latitude);
+canairio_store.set('longitude',this.longitude);
+canairio_store.set('altitude',this.altitude);
+canairio_store.set('datetime_ux',this.datetime_ux);
+canairio_store.save();
+
+
+
+}
+
+
 
 
 
@@ -67,7 +150,7 @@ this.getLocation();
     }
 
 
- async  connect(): Promise <void> {
+ async  connect(){
 
   try {
     await BleClient.initialize();
@@ -76,59 +159,13 @@ this.getLocation();
  
     });
 
-        console.log('device', device);
+  //      console.log('device', device);
 
    await BleClient.connect(device.deviceId);
-    console.log('connected to device', device);
+//    console.log('connected to device', device);
     
-  const result = await BleClient.read(device.deviceId, PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC);
-
-
-
-   console.log('canair.io result array', dataViewToText(result));
-
-
-
-let d = new Date();
-this.datetime=d;
-var unixTimeStamp = Math.floor(d.getTime() / 1000);
-this.datetime_ux=unixTimeStamp.toString();
-
-this.output_json=dataViewToText(result);
-
-this.txtpm25=this.output_json;
-
-var Comment = Parse.Object.extend('canairio_raw_data'); 
-
-
-
-    await BleClient.startNotifications(
-      device.deviceId,
-      PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC,
-
-      (value) => {
-var canairio_store = new Comment();
-
-this.txtpm25=dataViewToText(value);
-
-// set initial data record
-canairio_store.set('output_json',dataViewToText(value));
-canairio_store.set('latitude',this.latitude);
-canairio_store.set('longitude',this.longitude);
-canairio_store.set('altitude',this.altitude);
-canairio_store.set('unix_time',this.datetime_ux);
-canairio_store.save();
-      }
-    );
-
-
-
-
-
-
-
-
-
+ this.deviceId=device.deviceId;
+this.readandSave();
 
 
     setTimeout(async () => {

@@ -14180,6 +14180,74 @@ function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
 
 /***/ }),
 
+/***/ 10250:
+/*!***************************************************!*\
+  !*** ./node_modules/guid-typescript/dist/guid.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+exports.__esModule = true;
+var Guid = /** @class */ (function () {
+    function Guid(guid) {
+        if (!guid) {
+            throw new TypeError("Invalid argument; `value` has no value.");
+        }
+        this.value = Guid.EMPTY;
+        if (guid && Guid.isGuid(guid)) {
+            this.value = guid;
+        }
+    }
+    Guid.isGuid = function (guid) {
+        var value = guid.toString();
+        return guid && (guid instanceof Guid || Guid.validator.test(value));
+    };
+    Guid.create = function () {
+        return new Guid([Guid.gen(2), Guid.gen(1), Guid.gen(1), Guid.gen(1), Guid.gen(3)].join("-"));
+    };
+    Guid.createEmpty = function () {
+        return new Guid("emptyguid");
+    };
+    Guid.parse = function (guid) {
+        return new Guid(guid);
+    };
+    Guid.raw = function () {
+        return [Guid.gen(2), Guid.gen(1), Guid.gen(1), Guid.gen(1), Guid.gen(3)].join("-");
+    };
+    Guid.gen = function (count) {
+        var out = "";
+        for (var i = 0; i < count; i++) {
+            // tslint:disable-next-line:no-bitwise
+            out += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return out;
+    };
+    Guid.prototype.equals = function (other) {
+        // Comparing string `value` against provided `guid` will auto-call
+        // toString on `guid` for comparison
+        return Guid.isGuid(other) && this.value === other.toString();
+    };
+    Guid.prototype.isEmpty = function () {
+        return this.value === Guid.EMPTY;
+    };
+    Guid.prototype.toString = function () {
+        return this.value;
+    };
+    Guid.prototype.toJSON = function () {
+        return {
+            value: this.value
+        };
+    };
+    Guid.validator = new RegExp("^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$", "i");
+    Guid.EMPTY = "00000000-0000-0000-0000-000000000000";
+    return Guid;
+}());
+exports.Guid = Guid;
+
+
+/***/ }),
+
 /***/ 76201:
 /*!***************************************************!*\
   !*** ./node_modules/idb-keyval/dist/cjs/index.js ***!
@@ -39287,15 +39355,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "HomePage": () => (/* binding */ HomePage)
 /* harmony export */ });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! tslib */ 64762);
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! tslib */ 64762);
 /* harmony import */ var _raw_loader_home_page_html__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !raw-loader!./home.page.html */ 49764);
 /* harmony import */ var _home_page_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./home.page.scss */ 2610);
 /* harmony import */ var parse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! parse */ 47836);
 /* harmony import */ var parse__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(parse__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/core */ 37716);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @angular/core */ 37716);
 /* harmony import */ var _app_app_constant__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../app/app.constant */ 99908);
 /* harmony import */ var _capacitor_geolocation__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @capacitor/geolocation */ 61091);
-/* harmony import */ var _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @capacitor-community/bluetooth-le */ 73537);
+/* harmony import */ var guid_typescript__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! guid-typescript */ 10250);
+/* harmony import */ var _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @capacitor-community/bluetooth-le */ 73537);
+
 
 
 
@@ -39315,9 +39385,54 @@ let HomePage = class HomePage {
         this.parseInitialize();
         this.getLocation();
         this.connect();
+        this.logInterval = 10000;
+        this.lblLogstatus = "Not logging";
+    }
+    startLogging() {
+        return (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__awaiter)(this, void 0, void 0, function* () {
+            this.intervalID = setInterval(() => {
+                this.lblLogstatus = "Logging..";
+                console.log("do stuff...");
+                this.readandSave();
+                /*
+                          if (some.condition = true) {
+                            clearInterval(id);
+                          }*/
+            }, this.logInterval);
+        });
+    }
+    stopLogging() {
+        return (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__awaiter)(this, void 0, void 0, function* () {
+            clearInterval(this.intervalID);
+            this.lblLogstatus = "Not logging";
+        });
+    }
+    readandSave() {
+        return (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__awaiter)(this, void 0, void 0, function* () {
+            const result = yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_6__.BleClient.read(this.deviceId, PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC);
+            //   console.log('canair.io result array', dataViewToText(result));
+            let d = new Date();
+            this.datetime = d;
+            var unixTimeStamp = Math.floor(d.getTime() / 1000);
+            this.datetime_ux = unixTimeStamp.toString();
+            this.output_json = (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_6__.dataViewToText)(result);
+            this.txtpm25 = this.output_json;
+            this.rec_uid = guid_typescript__WEBPACK_IMPORTED_MODULE_5__.Guid.raw(); // make it a string
+            var Comment = parse__WEBPACK_IMPORTED_MODULE_2__.Parse.Object.extend('canairio_raw_data');
+            var canairio_store = new Comment();
+            // set initial data record
+            canairio_store.set('record_UID', this.rec_uid);
+            canairio_store.set('device_UID', this.deviceId);
+            canairio_store.set('output_json', (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_6__.dataViewToText)(result));
+            canairio_store.set('latitude', this.latitude);
+            canairio_store.set('longitude', this.longitude);
+            canairio_store.set('altitude', this.altitude);
+            canairio_store.set('datetime_ux', this.datetime_ux);
+            canairio_store.save();
+        });
     }
     getLocation() {
-        return (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__awaiter)(this, void 0, void 0, function* () {
+        return (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__awaiter)(this, void 0, void 0, function* () {
             const position = yield _capacitor_geolocation__WEBPACK_IMPORTED_MODULE_4__.Geolocation.getCurrentPosition();
             this.latitude = position.coords.latitude;
             this.longitude = position.coords.longitude;
@@ -39330,37 +39445,19 @@ let HomePage = class HomePage {
         parse__WEBPACK_IMPORTED_MODULE_2__.Parse.serverURL = this.parseServerUrl;
     }
     connect() {
-        return (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__awaiter)(this, void 0, void 0, function* () {
+        return (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__awaiter)(this, void 0, void 0, function* () {
             try {
-                yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.initialize();
-                const device = yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.requestDevice({
+                yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_6__.BleClient.initialize();
+                const device = yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_6__.BleClient.requestDevice({
                     namePrefix: 'CanAirIO'
                 });
-                console.log('device', device);
-                yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.connect(device.deviceId);
-                console.log('connected to device', device);
-                const result = yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.read(device.deviceId, PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC);
-                console.log('canair.io result array', (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(result));
-                let d = new Date();
-                this.datetime = d;
-                var unixTimeStamp = Math.floor(d.getTime() / 1000);
-                this.datetime_ux = unixTimeStamp.toString();
-                this.output_json = (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(result);
-                this.txtpm25 = this.output_json;
-                var Comment = parse__WEBPACK_IMPORTED_MODULE_2__.Parse.Object.extend('canairio_raw_data');
-                yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.startNotifications(device.deviceId, PM25_SERVICE, PM25_SERVICE_CHARACTERISTIC, (value) => {
-                    var canairio_store = new Comment();
-                    this.txtpm25 = (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(value);
-                    // set initial data record
-                    canairio_store.set('output_json', (0,_capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.dataViewToText)(value));
-                    canairio_store.set('latitude', this.latitude);
-                    canairio_store.set('longitude', this.longitude);
-                    canairio_store.set('altitude', this.altitude);
-                    canairio_store.set('unix_time', this.datetime_ux);
-                    canairio_store.save();
-                });
-                setTimeout(() => (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__awaiter)(this, void 0, void 0, function* () {
-                    yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_5__.BleClient.stopLEScan();
+                //      console.log('device', device);
+                yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_6__.BleClient.connect(device.deviceId);
+                //    console.log('connected to device', device);
+                this.deviceId = device.deviceId;
+                this.readandSave();
+                setTimeout(() => (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__awaiter)(this, void 0, void 0, function* () {
+                    yield _capacitor_community_bluetooth_le__WEBPACK_IMPORTED_MODULE_6__.BleClient.stopLEScan();
                     console.log('stopped scanning');
                 }), 5000);
             }
@@ -39371,8 +39468,8 @@ let HomePage = class HomePage {
     }
 };
 HomePage.ctorParameters = () => [];
-HomePage = (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__decorate)([
-    (0,_angular_core__WEBPACK_IMPORTED_MODULE_7__.Component)({
+HomePage = (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__decorate)([
+    (0,_angular_core__WEBPACK_IMPORTED_MODULE_8__.Component)({
         selector: 'app-home',
         template: _raw_loader_home_page_html__WEBPACK_IMPORTED_MODULE_0__.default,
         styles: [_home_page_scss__WEBPACK_IMPORTED_MODULE_1__.default]
@@ -40829,7 +40926,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n      Canair.io MOBIS plugin\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content [fullscreen]=\"true\">\n  <ion-header collapse=\"condense\">\n    <ion-toolbar>\n      <ion-title size=\"large\">Canair.io plugin</ion-title>\n    </ion-toolbar>\n  </ion-header>\n<ion-item>\n<img src=\"assets/images/logo.png\">\n</ion-item>\n\n  <div id=\"container\">\n\n\n\n<ion-item>\n    <ion-label>\nCanairio output\n</ion-label>\n  </ion-item>\n<ion-item>\n   <ion-label primary>{{txtpm25}} </ion-label>\n   \n</ion-item>\n\n\n\n\n\n<ion-item>\n    <ion-label>  \nCoordinates</ion-label>\n</ion-item>\n\n<ion-item>\n   <ion-label primary>Lat: {{latitude}} </ion-label>\n   <ion-label primary>Lon: {{longitude}} </ion-label>\n   <ion-label primary>Alt: {{altitude}} </ion-label>\n   \n</ion-item>\n\n</div>\n\n</ion-content>\n");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n      Canair.io MOBIS plugin\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content [fullscreen]=\"true\">\n  <ion-header collapse=\"condense\">\n    <ion-toolbar>\n      <ion-title size=\"large\">Canair.io plugin</ion-title>\n    </ion-toolbar>\n  </ion-header>\n<ion-item>\n<img src=\"assets/images/logo.png\">\n</ion-item>\n\n  <div id=\"container\">\n\n\n\n<ion-item>\n    <ion-label>\nCanairio output\n</ion-label>\n  </ion-item>\n<ion-item>\n   <ion-label primary>{{txtpm25}} </ion-label>\n   \n</ion-item>\n\n\n\n\n\n<ion-item>\n    <ion-label>  \nCoordinates</ion-label>\n</ion-item>\n\n<ion-item>\n   <ion-label primary>Lat: {{latitude}} </ion-label>\n   <ion-label primary>Lon: {{longitude}} </ion-label>\n   <ion-label primary>Alt: {{altitude}} </ion-label>\n   \n</ion-item>\n\n\n\n<ion-item>\n<ion-button (click) =\"startLogging()\">Start logging</ion-button>   \n<ion-button (click) =\"stopLogging()\"> Stop logging</ion-button>   \n</ion-item>\n\n<ion-item>\n<ion-input>Log Interval:{{logInterval}}</ion-input>   \n</ion-item>\n\n<ion-item>\n<ion-label>Log status:{{lblLogstatus}}</ion-label>   \n</ion-item>\n\n\n\n</div>\n\n\n\n\n</ion-content>\n");
 
 /***/ }),
 

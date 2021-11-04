@@ -29,6 +29,7 @@
     "@capacitor/keyboard": "1.1.2",
     "@capacitor/status-bar": "1.0.5",
     "@ionic/angular": "^5.5.2",
+    "guid-typescript": "^1.0.9",
     "parse": "^3.3.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",

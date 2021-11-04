@@ -46,6 +46,26 @@ Coordinates</ion-label>
    
 </ion-item>
 
+
+
+<ion-item>
+<ion-button (click) ="startLogging()">Start logging</ion-button>   
+<ion-button (click) ="stopLogging()"> Stop logging</ion-button>   
+</ion-item>
+
+<ion-item>
+<ion-input>Log Interval:{{logInterval}}</ion-input>   
+</ion-item>
+
+<ion-item>
+<ion-label>Log status:{{lblLogstatus}}</ion-label>   
+</ion-item>
+
+
+
 </div>
+
+
+
 
 </ion-content>
