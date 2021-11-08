@@ -39390,9 +39390,10 @@ let HomePage = class HomePage {
     }
     startLogging() {
         return (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__awaiter)(this, void 0, void 0, function* () {
+            this.lblLogstatus = "Logging..";
             this.intervalID = setInterval(() => {
-                this.lblLogstatus = "Logging..";
                 console.log("do stuff...");
+                this.getLocation();
                 this.readandSave();
                 /*
                           if (some.condition = true) {
@@ -39433,8 +39434,9 @@ let HomePage = class HomePage {
     }
     getLocation() {
         return (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__awaiter)(this, void 0, void 0, function* () {
-            const position = yield _capacitor_geolocation__WEBPACK_IMPORTED_MODULE_4__.Geolocation.getCurrentPosition();
+            const position = yield _capacitor_geolocation__WEBPACK_IMPORTED_MODULE_4__.Geolocation.getCurrentPosition({ enableHighAccuracy: true });
             this.latitude = position.coords.latitude;
+            console.log(position.coords.latitude);
             this.longitude = position.coords.longitude;
             this.altitude = position.coords.altitude;
             return position.coords;
@@ -40926,7 +40928,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n      Canair.io MOBIS plugin\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content [fullscreen]=\"true\">\n  <ion-header collapse=\"condense\">\n    <ion-toolbar>\n      <ion-title size=\"large\">Canair.io plugin</ion-title>\n    </ion-toolbar>\n  </ion-header>\n<ion-item>\n<img src=\"assets/images/logo.png\">\n</ion-item>\n\n  <div id=\"container\">\n\n\n\n<ion-item>\n    <ion-label>\nCanairio output\n</ion-label>\n  </ion-item>\n<ion-item>\n   <ion-label primary>{{txtpm25}} </ion-label>\n   \n</ion-item>\n\n\n\n\n\n<ion-item>\n    <ion-label>  \nCoordinates</ion-label>\n</ion-item>\n\n<ion-item>\n   <ion-label primary>Lat: {{latitude}} </ion-label>\n   <ion-label primary>Lon: {{longitude}} </ion-label>\n   <ion-label primary>Alt: {{altitude}} </ion-label>\n   \n</ion-item>\n\n\n\n<ion-item>\n<ion-button (click) =\"startLogging()\">Start logging</ion-button>   \n<ion-button (click) =\"stopLogging()\"> Stop logging</ion-button>   \n</ion-item>\n\n<ion-item>\n<ion-input>Log Interval:{{logInterval}}</ion-input>   \n</ion-item>\n\n<ion-item>\n<ion-label>Log status:{{lblLogstatus}}</ion-label>   \n</ion-item>\n\n\n\n</div>\n\n\n\n\n</ion-content>\n");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n      Canair.io MOBIS plugin\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content [fullscreen]=\"true\">\n  <ion-header collapse=\"condense\">\n    <ion-toolbar>\n      <ion-title size=\"large\">Canair.io plugin</ion-title>\n    </ion-toolbar>\n  </ion-header>\n<ion-item>\n<img src=\"assets/images/logo.png\">\n</ion-item>\n\n  <div id=\"container\">\n\n\n\n<ion-item>\n    <ion-label>\nCanairio output\n</ion-label>\n  </ion-item>\n<ion-item>\n   <ion-label primary>{{txtpm25}} </ion-label>\n   \n</ion-item>\n\n\n\n\n\n<ion-item>\n    <ion-label>  \nCoordinates</ion-label>\n</ion-item>\n\n<ion-item>\n   <ion-label primary>Lat: {{latitude}} </ion-label>\n</ion-item>\n\n\n<ion-item>\n\n   <ion-label primary>Lon: {{longitude}} </ion-label>\n</ion-item>\n\n<ion-item>\n\n   <ion-label primary>Alt: {{altitude}} </ion-label>\n   \n</ion-item>\n\n\n\n<ion-item>\n<ion-button (click) =\"startLogging()\">Start logging</ion-button>   \n<ion-button (click) =\"stopLogging()\"> Stop logging</ion-button>   \n</ion-item>\n\n<ion-item>\n<ion-input>Log Interval:{{logInterval}}</ion-input>   \n</ion-item>\n\n<ion-item>\n<ion-label>Log status:{{lblLogstatus}}</ion-label>   \n</ion-item>\n\n\n\n</div>\n\n\n\n\n</ion-content>\n");
 
 /***/ }),
 

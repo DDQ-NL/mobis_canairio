@@ -54,31 +54,19 @@ this.lblLogstatus="Not logging";
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
   }
 
 
 
 async startLogging() {
-
+this.lblLogstatus="Logging..";
 
         this.intervalID = setInterval( () => {
 
 
-this.lblLogstatus="Logging..";
-          console.log("do stuff...") 
 
+          console.log("do stuff...") 
+          this.getLocation();
           this.readandSave();
 
 /*
@@ -135,8 +123,9 @@ canairio_store.save();
 
 
   async getLocation()  {
-  const position = await Geolocation.getCurrentPosition();
+  const position = await Geolocation.getCurrentPosition({enableHighAccuracy: true});
   this.latitude = position.coords.latitude;
+  console.log (position.coords.latitude);
   this.longitude = position.coords.longitude;
   this.altitude = position.coords.altitude;
   return position.coords;
